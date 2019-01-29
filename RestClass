@@ -1,0 +1,73 @@
+Integration Part of the Area
+-------------------------------
+
+@RestResource(urlmapping='/demo/')
+global with share class restresource{
+/* veriable decleartion of the values */
+global class restresource{
+public account acc;
+public contact con;
+}
+
+global class restwrapper{
+public string statecode;
+public string statemessage;
+public account acc;
+public contact cons;
+
+}
+global static restwrapper resturlmap(restresource restdecleration){
+restwrapper restmap = new restwrapper();
+try{
+insert restdecleration.acc;
+for(contact c:restdecleration.con){
+c.accountid = restdecleration.acc.id;
+}
+}
+upsert restdecleration.c;
+}
+catch(exception e){
+
+restmap.statecode = 'done';
+restmap.statemessage = 'test code improve';
+restmap.acc = restdecleration.acc;
+restmap.cons = restdecleration.con;
+return restwrapper;
+}
+}
+
+
+Test Class 
+--------------
+
+@istest
+public class Restapitestclass{
+
+public testmethod void testwebservice(){
+account a = new account()
+a.name = 'test';
+a.phone = '9032234892';
+a.website = 'www.staticmanagement.com';
+list<contact> conlist = new list<contact>();
+for(integer i=0;i<=10;i++){
+contact c = new contact();
+c.lastname = 'testmode'+i;
+conlist.add(c);
+}
+restresource.restwrapper rest = new restresource.restwrapper();
+rest.acc = a;
+rest.con = conlist;
+String JsonMsg=JSON.serialize(rest);
+test.starttest();
+restrequest req = new restrequest();
+restresponse respon = new restresponse();
+req.requestURI = '/services/apexrest/demo';
+req.httpmethod = 'POST';
+req.requestBody = Blob.valueof(JsonMsg);
+RestContext.request = req;
+RestContext.respose = res;
+restresource.restwrapper resp = new restresource.restwrapper()
+   resp=restresource.resturlmap(rest); 
+test.stoptest();
+}
+}
